@@ -1,0 +1,45 @@
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: openshift-k8s-ci
+spec:
+  description: >
+    Expects workspace "source" to contain this repository (populate with a git-clone task,
+    a PipelineRun workspace volume, or your CI trigger). No external TaskRef required.
+  workspaces:
+    - name: source
+  tasks:
+    - name: terraform-validate
+      workspaces:
+        - name: ws
+          workspace: source
+      taskSpec:
+        workspaces:
+          - name: ws
+        steps:
+          - name: fmt-validate
+            image: hashicorp/terraform:1.9
+            workingDir: $(workspaces.ws.path)/terraform/environments/dev
+            script: |
+              set -e
+              terraform init -backend=false
+              terraform fmt -check -recursive ../..
+              terraform validate
+    - name: kustomize-build
+      runAfter: [terraform-validate]
+      workspaces:
+        - name: ws
+          workspace: source
+      taskSpec:
+        workspaces:
+          - name: ws
+        steps:
+          - name: build-all-overlays
+            image: bitnami/kubectl:latest
+            workingDir: $(workspaces.ws.path)
+            script: |
+              set -e
+              for d in dev staging prod; do
+                echo "== k8s/overlays/$d =="
+                kubectl kustomize "k8s/overlays/$d" >/dev/null
+              done

@@ -1,0 +1,10 @@
+# Copy to backend.tf per environment and fill in your remote state.
+# terraform {
+#   backend "s3" {
+#     bucket         = "my-org-tfstate"
+#     key            = "openshift-k8s/<ENV>/terraform.tfstate"
+#     region         = "us-east-1"
+#     dynamodb_table = "terraform-locks"
+#     encrypt        = true
+#   }
+# }

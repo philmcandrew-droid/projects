@@ -1,0 +1,65 @@
+# Runs when OpenShift-k8s/ changes (repo root = this monorepo). Manual: Actions → OpenShift-k8s CI → Run workflow.
+name: OpenShift-k8s CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "OpenShift-k8s/**"
+      - ".github/workflows/openshift-k8s-ci.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "OpenShift-k8s/**"
+      - ".github/workflows/openshift-k8s-ci.yml"
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  terraform:
+    name: Terraform (${{ matrix.environment }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        environment: [dev, staging, prod]
+    defaults:
+      run:
+        working-directory: OpenShift-k8s/terraform/environments/${{ matrix.environment }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.0"
+
+      - name: Terraform fmt
+        run: terraform fmt -check -recursive ../..
+
+      - name: Terraform init
+        run: terraform init -backend=false
+
+      - name: Terraform validate
+        run: terraform validate
+
+  kustomize:
+    name: Kustomize (${{ matrix.overlay }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        overlay: [dev, staging, prod, dev-openshift]
+    defaults:
+      run:
+        working-directory: OpenShift-k8s
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Kustomize build
+        run: kubectl kustomize k8s/overlays/${{ matrix.overlay }}

@@ -1,0 +1,41 @@
+# Copy to .gitlab-ci.yml in repo root and adjust image versions / paths.
+
+stages:
+  - validate
+
+.terraform:
+  image: hashicorp/terraform:1.9
+  stage: validate
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+terraform:fmt:
+  extends: .terraform
+  script:
+    - terraform fmt -check -recursive terraform
+
+terraform:validate:
+  extends: .terraform
+  parallel:
+    matrix:
+      - TF_ENV: [dev, staging, prod]
+  script:
+    - cd "terraform/environments/${TF_ENV}"
+    - terraform init -backend=false
+    - terraform validate
+
+.kustomize:
+  image: bitnami/kubectl:latest
+  stage: validate
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+kustomize:build:
+  extends: .kustomize
+  parallel:
+    matrix:
+      - OVERLAY: [dev, staging, prod, dev-openshift]
+  script:
+    - kubectl kustomize "k8s/overlays/${OVERLAY}"

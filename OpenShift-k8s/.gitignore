@@ -1,0 +1,31 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Secrets and local env
+.env
+.env.*
+*.pem
+*.key
+kubeconfig
+*.kubeconfig
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Local OpenShift Local (CRC) installer download
+tools/crc-install/
+tools/crc-setup-log.txt

@@ -1,0 +1,12 @@
+# OpenShift only (Route CRD). Use: kubectl apply -k k8s/overlays/dev-openshift
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: app-dev
+
+resources:
+  - namespace.yaml
+  - ../../base
+
+components:
+  - ../../components/openshift-route
