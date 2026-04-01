@@ -4,6 +4,14 @@ kind: Kustomization
 resources:
   - deployment.yaml
   - service.yaml
+  - beer-deployment.yaml
+  - beer-service.yaml
+
+# Override for registry: kustomize edit set image beer-app=ghcr.io/OWNER/REPO/beer-app:TAG
+images:
+  - name: beer-app
+    newName: beer-app
+    newTag: latest
 
 labels:
   - pairs:

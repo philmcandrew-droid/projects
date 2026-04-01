@@ -7,6 +7,7 @@ namespace: app-dev
 resources:
   - namespace.yaml
   - ../../base
+  - route-beer.yaml
 
 components:
   - ../../components/openshift-route
