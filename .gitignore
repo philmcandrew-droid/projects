@@ -1,0 +1,17 @@
+# Cursor / local noise at monorepo root (do not commit)
+c-Users-philm-cursor-projects/terminals/
+c-Users-philm-cursor-projects/agent-tools/
+c-Users-philm-cursor-projects/agent-transcripts/
+
+# Accidental temp / workspace path copies
+C-Users-philm-AppData-Local-Temp-*/
+c-Users-philm-AppData-Roaming-Cursor-Workspaces-*/
+c-Users-philm-cursor-projects-beer-can/
+
+# Other Cursor workspace mirrors (agent logs / terminals)
+c-Users-philm-cursor-spotify-playlist-finder/
+c-Users-philm-cursor-web-archive-search/
+c-Users-philm-cursor/
+
+# Nested clone — track via submodule or separate repo, not as gitlink
+MusicMan/
